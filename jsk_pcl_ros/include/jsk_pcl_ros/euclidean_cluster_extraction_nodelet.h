@@ -56,6 +56,8 @@
 #include "jsk_recognition_msgs/ClusterPointIndices.h"
 #include "jsk_pcl_ros/EuclideanSegment.h"
 #include "jsk_recognition_msgs/Int32Stamped.h"
+#include "jsk_recognition_msgs/ColorHistogram.h"
+#include "jsk_recognition_msgs/ColorHistogramArray.h"
 
 #include "jsk_pcl_ros/EuclideanClusteringConfig.h"
 #include <diagnostic_updater/diagnostic_updater.h>
@@ -86,6 +88,7 @@ namespace jsk_pcl_ros
     ros::Publisher result_pub_;
     ros::Subscriber sub_input_;
     ros::Publisher cluster_num_pub_;
+    ros::Publisher histogram_pub_;
 
     ros::ServiceServer service_;
 

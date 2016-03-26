@@ -49,7 +49,10 @@ namespace jsk_pcl_ros
     vital_checker_->poke();
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud
       (new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_out
+      (new pcl::PointCloud<pcl::PointXYZRGB>);
     pcl::fromROSMsg(*input, *cloud);
+    pcl::fromROSMsg(*input, *cloud_out);
     
     std::vector<pcl::PointIndices> cluster_indices;
     // list up indices which are not NaN to use
@@ -136,6 +139,41 @@ namespace jsk_pcl_ros
     }
 
     result_pub_.publish(result);
+    // I added
+    int r=0;
+    int g=0;
+    int b=0;
+    std::vector<float> histogram(64, 0);
+    std::vector<std::vector<float> > histograms;
+    histograms.resize(cluster_indices.size());
+    jsk_recognition_msgs::ColorHistogramArray histogram_array;
+    histogram_array.header = input->header;
+    for (size_t i = 0; i < cluster_indices.size(); i++){
+      for (size_t j = 0; j < cluster_indices[i].indices.size(); j++){
+	r = cloud_out->points[cluster_indices[i].indices[j]].r;
+	g = cloud_out->points[cluster_indices[i].indices[j]].g;
+	b = cloud_out->points[cluster_indices[i].indices[j]].b;
+	if (r < 64){ r = 0; } // 32 -> 0
+	else if (r < 128){ r = 1; } // 96 -> 1
+	else if (r < 192){ r = 2; } // 128 -> 2
+	else { r = 3; } // 224 -> 3
+	if (g < 64){ g = 0; }
+	else if (g < 128){ g = 1; }
+	else if (g < 192){ g = 2; }
+	else {g = 3; }
+	if (b < 64){ b = 0; }
+	else if (b < 128){ b = 1; }
+	else if (b < 192){ b = 2; }
+	else { b = 3; }
+	histogram[r*16 + g*4 + b] = histogram[r*16 + g*4 + b] + 1.0;
+      }
+      jsk_recognition_msgs::ColorHistogram ros_histogram;
+      ros_histogram.header = input->header;
+      ros_histogram.histogram = histogram;
+      histogram_array.histograms.push_back(ros_histogram);
+    }
+
+    histogram_pub_.publish(histogram_array);
     
     jsk_recognition_msgs::Int32Stamped::Ptr cluster_num_msg (new jsk_recognition_msgs::Int32Stamped);
     cluster_num_msg->header = input->header;
@@ -235,6 +273,8 @@ namespace jsk_pcl_ros
     ////////////////////////////////////////////////////////
     result_pub_ = advertise<jsk_recognition_msgs::ClusterPointIndices> (*pnh_, "output", 1);
     cluster_num_pub_ = advertise<jsk_recognition_msgs::Int32Stamped> (*pnh_, "cluster_num", 1);
+    // I added
+    histogram_pub_ = advertise<jsk_recognition_msgs::ColorHistogramArray> (*pnh_, "histogram", 1);
     service_ = pnh_->advertiseService(pnh_->resolveName("euclidean_clustering"),
                                       &EuclideanClustering::serviceCallback, this);
 
