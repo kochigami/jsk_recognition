@@ -305,12 +305,34 @@ namespace jsk_pcl_ros
     double xwidth = maxpt[0] - minpt[0];
     double ywidth = maxpt[1] - minpt[1];
     double zwidth = maxpt[2] - minpt[2];
-    
+    int r = 0; 
+    int g = 0;
+    int b = 0;
+    bounding_box.histogram.resize(64, 0);
+
+    for (size_t i =0; i < segmented_cloud_transformed->points.size(); i++){
+      r = segmented_cloud_transformed->points[i].r;
+      g = segmented_cloud_transformed->points[i].g;
+      b = segmented_cloud_transformed->points[i].b;
+      if (r < 64){ r = 0; } // 32 -> 0
+      else if (r < 128){ r = 1; } // 96 -> 1
+      else if (r < 192){ r = 2; } // 128 -> 2
+      else { r = 3; } // 224 -> 3
+      if (g < 64){ g = 0; }
+      else if (g < 128){ g = 1; }
+      else if (g < 192){ g = 2; }
+      else {g = 3; }
+      if (b < 64){ b = 0; }
+      else if (b < 128){ b = 1; }
+      else if (b < 192){ b = 2; }
+      else { b = 3; }
+      bounding_box.histogram[r*16 + g*4 + b]++;
+    }
+
     Eigen::Vector4f center2((maxpt[0] + minpt[0]) / 2.0, (maxpt[1] + minpt[1]) / 2.0, (maxpt[2] + minpt[2]) / 2.0, 1.0);
     Eigen::Vector4f center_transformed = m4 * center2;
       
-    bounding_box.header = header;
-    
+    bounding_box.header = header;    
     bounding_box.pose.position.x = center_transformed[0];
     bounding_box.pose.position.y = center_transformed[1];
     bounding_box.pose.position.z = center_transformed[2];
