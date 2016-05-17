@@ -1,0 +1,22 @@
+<launch>
+  <node name="rosbag_play"
+        pkg="rosbag" type="play"
+        args="/home/kochigami/2016-05-17-19-38-19.bag  --loop" /> 
+
+  <node name="nodelet_manager"
+         pkg="nodelet" type="nodelet"
+         args="manager" />
+
+  <node name="imagesift"
+        pkg="nodelet" type="nodelet"
+        args="load imagesift/ImageSift nodelet_manager">
+    <remap from="image" to="/pepper_robot/naoqi_driver_node/camera/front/image_raw"/>
+    <remap from="camera_info" to="/pepper_robot/naoqi_driver_node/camera/front/camera_info" />
+  </node>
+
+  <node name="point_pose_extractor" pkg="jsk_perception" type="point_pose_extractor"
+             respawn="true" output="screen">
+    <param name="template_filename" value="$(find jsk_perception)/sample/point_pose_extractor_example.png"/>
+    <param name="window_name" value="img0000"/>
+  </node>
+</launch>

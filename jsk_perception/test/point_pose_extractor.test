@@ -1,0 +1,14 @@
+<launch>
+  <include file="$(find jsk_perception)/sample/sample_point_pose_extractor.launch">
+  </include>
+
+  <test test-name="test_point_pose_extractor"
+        name="test_point_pose_extractor"
+        pkg="jsk_tools" type="test_topic_published.py"
+        time-limit="360">
+    <rosparam>
+      topic_0: /ObjectDetection
+      timeout_0: 10
+    </rosparam>
+  </test>
+</launch>
