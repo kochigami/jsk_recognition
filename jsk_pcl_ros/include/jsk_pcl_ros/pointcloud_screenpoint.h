@@ -34,23 +34,22 @@
  *********************************************************************/
 // Haseru Chen, Kei Okada, Yohei Kakiuchi
 
+#ifndef JSK_PCL_ROS_POINTCLOUD_SCREENPOINT_H_
+#define JSK_PCL_ROS_POINTCLOUD_SCREENPOINT_H_
 #include <pcl_ros/pcl_nodelet.h>
-#include <pcl_ros/point_cloud.h>
 
 #include <pcl/features/normal_3d.h>
 #include <pcl/kdtree/kdtree_flann.h>
 
 #include <pluginlib/class_list_macros.h>
 
-#include <message_filters/subscriber.h>
-#include <message_filters/synchronizer.h>
-#include <message_filters/sync_policies/exact_time.h>
-#include <message_filters/sync_policies/approximate_time.h>
-
+#include <sensor_msgs/CameraInfo.h>
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/PolygonStamped.h>
 
 #include "jsk_recognition_msgs/TransformScreenpoint.h"
+
+#include "jsk_topic_tools/connection_based_nodelet.h"
 
 #include <boost/thread/mutex.hpp>
 
@@ -58,7 +57,7 @@
 
 namespace jsk_pcl_ros
 {
-  class PointcloudScreenpoint : public pcl_ros::PCLNodelet
+  class PointcloudScreenpoint : public jsk_topic_tools::ConnectionBasedNodelet
   {
     typedef message_filters::sync_policies::ApproximateTime<
       sensor_msgs::PointCloud2,
@@ -101,6 +100,8 @@ namespace jsk_pcl_ros
 #endif
 
     void onInit();
+    void subscribe();
+    void unsubscribe();
     bool screenpoint_cb(jsk_recognition_msgs::TransformScreenpoint::Request &req,
                         jsk_recognition_msgs::TransformScreenpoint::Response &res);
     void points_cb(const sensor_msgs::PointCloud2ConstPtr &msg);
@@ -136,3 +137,4 @@ namespace jsk_pcl_ros
   };
 }
 
+#endif
