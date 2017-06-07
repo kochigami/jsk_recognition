@@ -36,13 +36,17 @@
 
 #ifndef JSK_PCL_ROS_POINTCLOUD_SCREENPOINT_H_
 #define JSK_PCL_ROS_POINTCLOUD_SCREENPOINT_H_
-#include <pcl_ros/pcl_nodelet.h>
-
 #include <pcl/features/normal_3d.h>
 #include <pcl/kdtree/kdtree_flann.h>
 
 #include <pluginlib/class_list_macros.h>
 
+#include <message_filters/subscriber.h>
+#include <message_filters/synchronizer.h>
+#include <message_filters/sync_policies/exact_time.h>
+#include <message_filters/sync_policies/approximate_time.h>
+
+#include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/PolygonStamped.h>

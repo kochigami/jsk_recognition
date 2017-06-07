@@ -33,7 +33,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include <jsk_topic_tools/log_utils.h>
+#define BOOST_PARAMETER_MAX_ARITY 7
 #include "jsk_pcl_ros/pointcloud_screenpoint.h"
 #include <pcl_conversions/pcl_conversions.h>
 
